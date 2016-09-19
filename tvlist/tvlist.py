@@ -2,6 +2,7 @@
 
 import requests
 import argparse
+import sohu
 
 def get_args():
     parser = argparse.ArgumentParser(description='Get video urls in a TV playlist url')
@@ -12,4 +13,19 @@ def get_args():
     return parser.parse_args()
 
 if __name__ == '__main__':
-    print(get_args())
+    args = get_args()
+    url = args.url
+    page = requests.get(url)
+    if page.status_code == 200:
+        page_content = page.text
+    else: 
+        print("Can not open TV url !!")
+    playlist_urls = sohu.playlist_url(page_content)
+    start = args.start
+    end = args.end + 1
+    if not end: end = None 
+    if args.info:
+        print(playlist_urls[0])
+    else :
+        print(' '.join(playlist_urls[start:end]))
+
