@@ -1,11 +1,12 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import requests
 import re
 import json
 
 def get_id(page):
-    pattern = re.compile('playlistId *= *"([0-9]*)"')
+    pattern = re.compile('playlist.*Id *= *"([0-9]*)"', re.I)
     playlist_id = pattern.search(page)
     if playlist_id is not None:
         return playlist_id.group(1)
@@ -28,7 +29,10 @@ def get_json(page):
 def playlist_url(page):
     json_list = get_json(page)
     if json_list:
-        name = json_list['showAlbumName']
+        if 'showAlbumName' in json_list.keys():
+            name = json_list['showAlbumName']
+        else:
+            name = json_list['albumName']
         update_info = json_list['updateNotification']
         videos = json_list['videos']
         free_videos = [ x for x in videos if not x['tvIsFee'] ]
