@@ -5,14 +5,14 @@ import requests
 import re
 import json
 
-def get_id(page):
+def get_playlist_id(url_content):
     pattern = re.compile('playlist.*Id *= *"([0-9]*)"', re.I)
-    playlist_id = pattern.search(page)
+    playlist_id = pattern.search(url_content)
     if playlist_id is not None:
         return playlist_id.group(1)
     else :
-        print("Can not find playlist ID !!")
-        return 0
+        print("Find playlist ID Failed !!")
+        return False
 
 def get_json(page):
     playlist_id = get_id(page)
