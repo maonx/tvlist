@@ -4,43 +4,53 @@
 import requests
 import re
 import json
+from common import *
 
-def get_playlist_id(url_content):
-    pattern = re.compile('playlist.*Id *= *"([0-9]*)"', re.I)
-    playlist_id = pattern.search(url_content)
-    if playlist_id is not None:
-        return playlist_id.group(1)
-    else :
-        print("Find playlist ID Failed !!")
+def get_playlist_id(url):
+    try:
+        url_content = download_url_content(url)
+        pattern = re.compile('playlist.*Id *= *"([0-9]*)"', re.I)
+        playlist_id = pattern.search(url_content)
+    except Exception as e:
+        print('\nGet playlist ID failed!!', e)
         return False
+    return playlist_id.group(1)
 
-def get_json(page):
-    playlist_id = get_id(page)
-    if playlist_id:
+def get_playlist_json(playlist_id):
+    try:
         url = 'http://pl.hd.sohu.com/videolist?playlistid=' + playlist_id
-        page = requests.get(url)
-        if page.status_code == 200:
-            json_str = page.json()
-            return json_str
-        else: 
-            print("Can not open TV url !!")
-            return 0
+        playlist_json = json.loads(download_url_content(url))
+    except Exception as e:
+        print('\nGet playlist json failed!!', e)
+        return False
+    return playlist_json
 
-def playlist_url(page):
-    json_list = get_json(page)
-    if json_list:
-        if 'showAlbumName' in json_list.keys():
-            name = json_list['showAlbumName']
+def playlist_info(playlist_json):
+    try:
+        if 'showAlbumName' in playlist_json.keys():
+            playlist_name = playlist_json['showAlbumName']
         else:
-            name = json_list['albumName']
-        update_info = json_list['updateNotification']
-        videos = json_list['videos']
+            playlist_name = playlist_json['albumName']
+        update_info = playlist_json['updateNotification']
+        videos = playlist_json['videos']
         free_videos = [ x for x in videos if not x['tvIsFee'] ]
         download_info = '可免费下载 %d 集' % len(free_videos)
-        info = '\n'.join([name, update_info, download_info])
+    except Exception as e:
+        print('\nGet playlist infomation failed!!', e)
+
+    print('\n\t剧集名称:\t', playlist_name)
+    print('\n\t剧集更新:\t', update_info)
+    print('\n\t剧集下载:\t', download_info)
+
+def get_playlist_url(playlist_json):
+    try:
+        videos = playlist_json['videos']
+        free_videos = [ x for x in videos if not x['tvIsFee'] ]
         playlist_urls = [ x['pageUrl'] for x in free_videos ] 
-        playlist_urls.insert(0, info)
-        return playlist_urls
+    except Exception as e:
+        print('\nGet playlist url failed!!', e)
+        return False
+    return playlist_urls
 
         
 

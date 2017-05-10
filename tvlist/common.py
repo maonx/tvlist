@@ -4,8 +4,9 @@
 import requests
 
 def download_url_content(url):
-    url_content = False
-    response = requests.get(url)
-    if response.status_code == 200:
-        url_content = response.text
-    return url_content
+    try:
+        response = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        print('\nFailed!!', e)
+        return False
+    return response.text

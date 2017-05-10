@@ -9,17 +9,32 @@ class SohuExtractor(unittest.TestCase):
 
     """Docstring for CommonFuntions. """
 
-    url = ['http://tv.sohu.com/20170508/n492237339.shtml']
+    url = (('http://tv.sohu.com/20170508/n492237339.shtml', '9331535'),
+           ('http://tv.sohu.com/20170509/n492390412.shtml', '9182663'),
+           ('http://tv.sohu.com/20170510/n492391375.shtml', '9337016'),
+           ('http://tv.sohu.com/20170509/n492346595.shtml', '8373574'),
+           )
 
     def test_download_url_content(self):
-        for i in self.url:
-            url_content = download_url_content(i)
+        for url, playlist_id in self.url:
+            url_content = download_url_content(url)
             self.assertTrue(url_content)
 
     def test_get_playlist_id(self):
-        url = 'http://tv.sohu.com/20170508/n492237339.shtml'
-        url_content = download_url_content(url)
-        self.assertEqual(get_playlist_id(url_content), '9331535')
+        for url, playlist_id in self.url:
+            self.assertEqual(get_playlist_id(url), playlist_id)
+
+    def test_get_playlist_json(self):
+        for url, playlist_id in self.url:
+            self.assertTrue(get_playlist_json(playlist_id))
+
+    def test_get_playlist_url(self):
+        for url, playlist_id in self.url:
+            playlist_json = get_playlist_json(playlist_id)
+            self.assertTrue(get_playlist_url(playlist_json))
+
+
+        
 
 
 
